@@ -1,3 +1,45 @@
-﻿<div>
-    Sudoku
+﻿<!-- SudokuGrid.razor -->
+@using System.Collections.Generic
+
+<div class="container">
+    <div class="sudoku-grid">
+        @foreach (var row in sudokuGrid)
+        {
+            <div class="row">
+                @foreach (var cell in row)
+                {
+                    <div class="sudoku-grid-cell">@cell</div>
+                }
+            </div>
+        }
+    </div>
 </div>
+
+@code {
+    private List<List<int>> sudokuGrid;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        sudokuGrid = GenerateSudokuGrid();
+    }
+
+    private List<List<int>> GenerateSudokuGrid()
+    {
+        var grid = new List<List<int>>();
+
+        // Generate 9x9 Sudoku grid with random numbers
+        var rand = new Random();
+        for (int i = 0; i < 9; i++)
+        {
+            var row = new List<int>();
+            for (int j = 0; j < 9; j++)
+            {
+                row.Add(rand.Next(1, 10)); // Random number from 1 to 9
+            }
+            grid.Add(row);
+        }
+
+        return grid;
+    }
+}

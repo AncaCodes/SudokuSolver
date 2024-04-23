@@ -1,12 +1,10 @@
-﻿<!-- SudokuGrid.razor -->
-@using System.Collections.Generic
-
+﻿@using SudokuSolver.Web.Models
 <div class="container">
     <div class="sudoku-grid">
-        @foreach (var row in sudokuGrid)
+        @foreach (var grid in _globalGrid.LocalGrids)
         {
-            <div class="row">
-                @foreach (var cell in row)
+            <div>
+                @foreach (var cell in grid.Cells)
                 {
                     <div class="sudoku-grid-cell">@cell</div>
                 }
@@ -16,30 +14,32 @@
 </div>
 
 @code {
-    private List<List<int>> sudokuGrid;
-
+    private readonly GlobalGrid _globalGrid = new();
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        sudokuGrid = GenerateSudokuGrid();
+        PopulateGlobalGrid();
     }
 
-    private List<List<int>> GenerateSudokuGrid()
+    private void PopulateGlobalGrid()
     {
-        var grid = new List<List<int>>();
-
-        // Generate 9x9 Sudoku grid with random numbers
-        var rand = new Random();
-        for (int i = 0; i < 9; i++)
+        for (var x = 0; x < 3; x++)
         {
-            var row = new List<int>();
-            for (int j = 0; j < 9; j++)
+            for (var y = 0; y < 3; y++)
             {
-                row.Add(rand.Next(1, 10)); // Random number from 1 to 9
+                PopulateLocalGrid(_globalGrid.LocalGrids[x, y]);
             }
-            grid.Add(row);
         }
+    }
 
-        return grid;
+    private static void PopulateLocalGrid(LocalGrid localGrid)
+    {
+        for (var x = 0; x < 3; x++)
+        {
+            for (var y = 0; y < 3; y++)
+            {
+                localGrid.Cells[x, y].Value = Random.Shared.Next(1, 10);
+            }
+        }
     }
 }

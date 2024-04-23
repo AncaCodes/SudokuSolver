@@ -1,56 +1,52 @@
-﻿/* App.razor.css */
+﻿* {
+    --accent-color: #7b5299;
+}
 
-/* Global styles */
+
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0; /* Light gray background */
+    background-color: #f0f0f0;
     display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    height: 100vh; /* Full viewport height */
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
 .container {
     display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    justify-content: center;
+    align-items: center;
 }
 
-/* Sudoku grid styles */
 .sudoku-grid {
     display: grid;
-    position: relative;
-    grid-template-columns: repeat(9, 50px); /* 9 columns with 50px width each */
-    grid-template-rows: repeat(9, 50px); /* 9 rows with 50px height each */
-    background-color: #d1e8e2; /* Light green background */
-    padding: 30px; /* Add some padding */
-    border: 2px solid #7b5299; /* Purple border */
-    border-radius: 10px; /* Rounded corners */
+    grid-template-columns: repeat(9, 50px);
+    grid-template-rows: repeat(9, 50px);
+    background-color: #d1e8e2;
+    padding: 30px;
+    border: 2px solid var(--accent-color);
+    border-radius: 10px;
 }
 
 .sudoku-grid-cell {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.2em; /* Larger font size */
-    color: #7b5299; /* Purple text color */
-    background-color: #f0f0f0; /* Light gray background for cells */
-    border: 1px solid #7b5299; /* Purple border */
-    width: 50px; /* Fixed width for each cell */
-    height: 50px; /* Fixed height for each cell */
+    font-size: 18px;
+    color: var(--accent-color);
+    background-color: #f0f0f0;
+    border: 1px solid var(--accent-color);
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
 }
-
 
     .sudoku-grid-cell:nth-of-type(3n-2):nth-of-type(-n+12) {
         border-top-width: 3px;
-        border-top-color: #7b5299;
+        border-top-color: var(--accent-color);
     }
 
-
-
-
-    /* Add hover effect on cells */
     .sudoku-grid-cell:hover {
-        background-color: #7b5299; /* Purple background on hover */
-        color: #d1e8e2; /* White text color on hover */
+        background-color: var(--accent-color);
+        color: #d1e8e2;
     }

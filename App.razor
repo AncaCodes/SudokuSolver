@@ -1,45 +1,25 @@
 ﻿@using SudokuSolver.Web.Models
-<div class="container">
-    <div class="sudoku-grid">
-        @foreach (var grid in _globalGrid.LocalGrids)
-        {
-            <div>
-                @foreach (var cell in grid.Cells)
-                {
-                    <div class="sudoku-grid-cell">@cell</div>
-                }
-            </div>
-        }
+@using SudokuSolver.Web.Services
+@inject ISudokuGridFactory SudokuGridFactory
+
+@if (gridContext is not null)
+{
+    <div class="container">
+        <div class="sudoku-grid">
+            @foreach (var cell in gridContext.Cells)
+            {
+                <div class="sudoku-grid-cell">@cell</div>
+            }
+        </div>
     </div>
-</div>
+}
+
 
 @code {
-    private readonly GlobalGrid _globalGrid = new();
+    private GridContext? gridContext;
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        PopulateGlobalGrid();
-    }
-
-    private void PopulateGlobalGrid()
-    {
-        for (var x = 0; x < 3; x++)
-        {
-            for (var y = 0; y < 3; y++)
-            {
-                PopulateLocalGrid(_globalGrid.LocalGrids[x, y]);
-            }
-        }
-    }
-
-    private static void PopulateLocalGrid(LocalGrid localGrid)
-    {
-        for (var x = 0; x < 3; x++)
-        {
-            for (var y = 0; y < 3; y++)
-            {
-                localGrid.Cells[x, y].Value = Random.Shared.Next(1, 10);
-            }
-        }
+        gridContext = SudokuGridFactory.CreateRandomGrid();
     }
 }

@@ -1,18 +1,21 @@
 ﻿* {
     --accent-color: #7b5299;
+    --base-color: #f0f0f0;
+    --light-border: #af88cc;
+    --outline-border: 3px solid purple;
 }
-
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: var(--base-color);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    margin: 0;
 }
 
 .container {
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -26,7 +29,9 @@ body {
     padding: 30px;
     border: 2px solid var(--accent-color);
     border-radius: 10px;
+
 }
+
 
 .sudoku-grid-cell {
     display: flex;
@@ -34,19 +39,48 @@ body {
     align-items: center;
     font-size: 18px;
     color: var(--accent-color);
-    background-color: #f0f0f0;
-    border: 1px solid var(--accent-color);
+    background-color: var(--base-color);
+    border: 1px solid var(--light-border);
     width: 50px;
     height: 50px;
     box-sizing: border-box;
 }
-
-    .sudoku-grid-cell:nth-of-type(3n-2):nth-of-type(-n+12) {
-        border-top-width: 3px;
-        border-top-color: var(--accent-color);
+/*    .sudoku-grid-cell:nth-child(3n-3) {
+        border-right: solid red;
+    }*/
+    .sudoku-grid-cell:nth-child(9n+1) {
+        border-left: var(--outline-border);
+    }
+    .sudoku-grid-cell:nth-child(9n+3) {
+        border-right:var(--outline-border);
+    }
+    .sudoku-grid-cell:nth-child(9n+6) {
+        border-right: var(--outline-border);
+    }
+    .sudoku-grid-cell:nth-child(9n+9) {
+        border-right: var(--outline-border);
     }
 
+    .sudoku-grid-cell:nth-child(-n+9) {
+        border-top: var(--outline-border)
+    }
+    .sudoku-grid-cell:nth-child(n+1):nth-child(-n+9) {
+        border-top: var(--outline-border);
+    }
+    .sudoku-grid-cell:nth-last-child(-n+9) {
+        border-bottom: var(--outline-border); /* Bottom row */
+    }
+
+    .sudoku-grid-cell:nth-child(n+19):nth-child(-n+27) {
+        border-bottom: var(--outline-border);
+    
+    }
+    .sudoku-grid-cell:nth-child(n+46):nth-child(-n+54) {
+        border-bottom: var(--outline-border);
+    } 
+
+
     .sudoku-grid-cell:hover {
-        background-color: var(--accent-color);
-        color: #d1e8e2;
+        background-color: var(--light-border);
+        color: var(--base-color);
     }

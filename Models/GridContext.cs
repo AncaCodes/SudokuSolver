@@ -2,5 +2,7 @@
 
 public class GridContext
 {
-    public required List<int> Cells { get; init; }    
+    public required int[,] Cells { get; init; }
+
+
 }

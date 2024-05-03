@@ -29,7 +29,6 @@ body {
     padding: 30px;
     border: 2px solid var(--accent-color);
     border-radius: 10px;
-
 }
 
 
@@ -45,18 +44,19 @@ body {
     height: 50px;
     box-sizing: border-box;
 }
-/*    .sudoku-grid-cell:nth-child(3n-3) {
-        border-right: solid red;
-    }*/
+
     .sudoku-grid-cell:nth-child(9n+1) {
         border-left: var(--outline-border);
     }
+
     .sudoku-grid-cell:nth-child(9n+3) {
-        border-right:var(--outline-border);
+        border-right: var(--outline-border);
     }
+
     .sudoku-grid-cell:nth-child(9n+6) {
         border-right: var(--outline-border);
     }
+
     .sudoku-grid-cell:nth-child(9n+9) {
         border-right: var(--outline-border);
     }
@@ -64,20 +64,22 @@ body {
     .sudoku-grid-cell:nth-child(-n+9) {
         border-top: var(--outline-border)
     }
+
     .sudoku-grid-cell:nth-child(n+1):nth-child(-n+9) {
         border-top: var(--outline-border);
     }
+
     .sudoku-grid-cell:nth-last-child(-n+9) {
         border-bottom: var(--outline-border); /* Bottom row */
     }
 
     .sudoku-grid-cell:nth-child(n+19):nth-child(-n+27) {
         border-bottom: var(--outline-border);
-    
     }
+
     .sudoku-grid-cell:nth-child(n+46):nth-child(-n+54) {
         border-bottom: var(--outline-border);
-    } 
+    }
 
 
     .sudoku-grid-cell:hover {

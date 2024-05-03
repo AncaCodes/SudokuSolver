@@ -5,4 +5,5 @@ namespace SudokuSolver.Web.Services;
 public interface ISudokuGridFactory
 {
     GridContext CreateRandomGrid();
+    
 }

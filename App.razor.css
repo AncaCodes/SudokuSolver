@@ -14,6 +14,11 @@ body {
     margin: 0;
 }
 
+button{
+    
+
+}
+
 .container {
     height: 100vh;
     display: flex;
@@ -70,7 +75,7 @@ body {
     }
 
     .sudoku-grid-cell:nth-last-child(-n+9) {
-        border-bottom: var(--outline-border); /* Bottom row */
+        border-bottom: var(--outline-border); 
     }
 
     .sudoku-grid-cell:nth-child(n+19):nth-child(-n+27) {
@@ -85,4 +90,33 @@ body {
     .sudoku-grid-cell:hover {
         background-color: var(--light-border);
         color: var(--base-color);
+    }
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px; 
+}
+
+.button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    color: var(--accent-color);
+    background-color: var(--base-color);
+    border: 1px solid var(--light-border);
+
+    width: 100px;
+    height: 20px;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+    .button:hover {
+        background-color: var(--light-border);
+        color: var(--outline-border);
     }

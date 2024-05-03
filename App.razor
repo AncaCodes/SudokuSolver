@@ -2,6 +2,12 @@
 @using SudokuSolver.Web.Services
 @inject ISudokuGridFactory SudokuGridFactory
 
+<div class="button-container">
+    <div class="button" @onclick="SetEasyDifficulty">Easy</div>
+    <div class="button" @onclick="SetMediumDifficulty">Medium</div>
+    <div class="button" @onclick="SetHardDifficulty">Hard</div>
+</div>
+
 @if (gridContext is not null)
 {
     <div class="container">
@@ -23,10 +29,28 @@
 
 
 @code {
+    int Difficulty;
     private GridContext? gridContext;
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        gridContext = SudokuGridFactory.CreateRandomGrid();
     }
+
+    void SetEasyDifficulty()
+    {
+        gridContext = SudokuGridFactory.CreateEasyGrid();
+
+    }
+    void SetMediumDifficulty()
+    {
+        gridContext = SudokuGridFactory.CreateMediumGrid();
+
+    }
+    void SetHardDifficulty()
+    {
+        gridContext = SudokuGridFactory.CreateHardGrid();
+
+    }
+
+ 
 }

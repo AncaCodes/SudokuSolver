@@ -9,14 +9,24 @@ namespace SudokuSolver.Web.Services;
 
 public class SudokuGridFactory : ISudokuGridFactory
 {
+    int[,] cells = new int[Settings.Dimension, Settings.Dimension];
 
     public GridContext CreateRandomGrid()
     {
-        int[,] cells = new int[Settings.Dimension, Settings.Dimension];
 
-        CheckFunctions.fillDiagonal(cells);
+        CheckFunctions.FillDiagonal(cells);
 
-        CheckFunctions.fillRemaining(0, Settings.SRN, cells);
+        CheckFunctions.FillRemaining(0, Settings.SRN, cells);
+        return new GridContext
+        {
+            Cells = cells
+        };
+
+    }
+    public GridContext CreateEasyGrid()
+    {
+        CreateRandomGrid();
+        CheckFunctions.RemoveKDigits(Random.Shared.Next(43, 49), cells);
 
         return new GridContext
         {
@@ -24,5 +34,30 @@ public class SudokuGridFactory : ISudokuGridFactory
         };
 
     }
+    public GridContext CreateMediumGrid()
+    {
+        CreateRandomGrid();
+
+        CheckFunctions.RemoveKDigits(Random.Shared.Next(50,55), cells);
+
+        return new GridContext
+        {
+            Cells = cells
+        };
+
+    }
+    public GridContext CreateHardGrid()
+    {
+        CreateRandomGrid();
+
+        CheckFunctions.RemoveKDigits(Random.Shared.Next(56, 60), cells);
+
+        return new GridContext
+        {
+            Cells = cells
+        };
+
+    }
+
 
 }

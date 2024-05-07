@@ -7,15 +7,15 @@
         public static void FillDiagonal(int[,] cells)
         {
 
-            for (int i = 0; i < Settings.Dimension; i = i + Settings.SRN)
+            for (int i = 0; i < Settings.Dimension; i = i + Settings.SRootDimension)
 
                 FillBox(i, i, cells);
         }
 
-        public static bool UnUsedInBox(int rowStart, int colStart, int num, int[,] cells)
+        public static bool UnusedInBox(int rowStart, int colStart, int num, int[,] cells)
         {
-            for (int i = 0; i < Settings.SRN; i++)
-                for (int j = 0; j < Settings.SRN; j++)
+            for (int i = 0; i < Settings.SRootDimension; i++)
+                for (int j = 0; j < Settings.SRootDimension; j++)
                     if (cells[rowStart + i, colStart + j] == num)
                         return false;
 
@@ -26,15 +26,15 @@
         {
 
             int num;
-            for (int i = 0; i < Settings.SRN; i++)
+            for (int i = 0; i < Settings.SRootDimension; i++)
             {
-                for (int j = 0; j < Settings.SRN; j++)
+                for (int j = 0; j < Settings.SRootDimension; j++)
                 {
                     do
                     {
                         num = Random.Shared.Next(Settings.MinCellValue, Settings.MaxCellValue);
                     }
-                    while (!UnUsedInBox(row, col, num, cells));
+                    while (!UnusedInBox(row, col, num, cells));
 
                     cells[row + i, col + j] = num;
                 }
@@ -44,12 +44,12 @@
 
         public static bool CheckIfSafe(int i, int j, int num, int[,] cells)
         {
-            return (UnUsedInRow(i, num, cells) &&
-                    UnUsedInCol(j, num, cells) &&
-                    UnUsedInBox(i - i % Settings.SRN, j - j % Settings.SRN, num, cells));
+            return (UnusedInRow(i, num, cells) &&
+                    UnusedInCol(j, num, cells) &&
+                    UnusedInBox(i - i % Settings.SRootDimension, j - j % Settings.SRootDimension, num, cells));
         }
 
-        public static bool UnUsedInRow(int i, int num, int[,] cells)
+        public static bool UnusedInRow(int i, int num, int[,] cells)
         {
             for (int j = 0; j < Settings.Dimension; j++)
                 if (cells[i, j] == num)
@@ -57,9 +57,9 @@
             return true;
         }
 
-        public static bool UnUsedInCol(int j, int num, int[,] cells)
+        public static bool UnusedInCol(int j, int num, int[,] cells)
         {
-            for (int i = 0; i < Settings.Dimension; i++)
+            for (int i = 0; i < Settings.Dimension ; i++)
                 if (cells[i, j] == num)
                     return false;
             return true;
@@ -76,19 +76,19 @@
             if (i >= Settings.Dimension && j >= Settings.Dimension)
                 return true;
 
-            if (i < Settings.SRN)
+            if (i < Settings.SRootDimension)
             {
-                if (j < Settings.SRN)
-                    j = Settings.SRN;
+                if (j < Settings.SRootDimension)
+                    j = Settings.SRootDimension;
             }
-            else if (i < Settings.Dimension - Settings.SRN)
+            else if (i < Settings.Dimension - Settings.SRootDimension)
             {
-                if (j == (int)(i / Settings.SRN) * Settings.SRN)
-                    j = j + Settings.SRN;
+                if (j == (int)(i / Settings.SRootDimension) * Settings.SRootDimension)
+                    j = j + Settings.SRootDimension;
             }
             else
             {
-                if (j == Settings.Dimension - Settings.SRN)
+                if (j == Settings.Dimension - Settings.SRootDimension)
                 {
                     i++;
                     j = 0;
@@ -127,6 +127,11 @@
                     cells[i, j] = 0;
                 }
             }
+        }
+        public static int ReturnIndices(int position)
+        {
+            return (position / Settings.Dimension) * 10 + (position % Settings.Dimension);
+            +1
         }
 
     }

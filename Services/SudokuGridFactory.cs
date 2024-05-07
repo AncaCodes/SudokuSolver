@@ -16,7 +16,7 @@ public class SudokuGridFactory : ISudokuGridFactory
 
         CheckFunctions.FillDiagonal(cells);
 
-        CheckFunctions.FillRemaining(0, Settings.SRN, cells);
+        CheckFunctions.FillRemaining(0, Settings.SRootDimension, cells);
         return new GridContext
         {
             Cells = cells

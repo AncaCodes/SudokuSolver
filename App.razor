@@ -14,14 +14,11 @@
         <div class="sudoku-grid">
             @foreach (var cell in gridContext.Cells)
             {
-                @if (@cell != 0)
-                {
-                    <div class="sudoku-grid-cell">@cell</div>
-                }
-                else
-                {
-                    <div class="sudoku-grid-cell"> </div>
-                }
+
+                <div class="sudoku-grid-cell">
+                    @(cell != 0 ? cell.ToString() : " ")
+                </div>
+             
             }
         </div>
     </div>
@@ -29,7 +26,6 @@
 
 
 @code {
-    int Difficulty;
     private GridContext? gridContext;
     protected override void OnInitialized()
     {

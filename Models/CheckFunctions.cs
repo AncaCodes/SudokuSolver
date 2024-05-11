@@ -59,7 +59,7 @@
 
         public static bool UnusedInCol(int j, int num, int[,] cells)
         {
-            for (int i = 0; i < Settings.Dimension ; i++)
+            for (int i = 0; i < Settings.Dimension; i++)
                 if (cells[i, j] == num)
                     return false;
             return true;
@@ -131,7 +131,7 @@
         public static int ReturnIndices(int position)
         {
             return (position / Settings.Dimension) * 10 + (position % Settings.Dimension);
-            +1
+            
         }
 
     }

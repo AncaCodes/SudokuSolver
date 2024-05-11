@@ -38,7 +38,7 @@ public class SudokuGridFactory : ISudokuGridFactory
     {
         CreateRandomGrid();
 
-        CheckFunctions.RemoveKDigits(Random.Shared.Next(50,55), cells);
+        CheckFunctions.RemoveKDigits(Random.Shared.Next(50, 55), cells);
 
         return new GridContext
         {

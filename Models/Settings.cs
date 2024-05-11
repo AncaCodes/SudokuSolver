@@ -7,6 +7,4 @@ public static class Settings
     public const int MaxCellValue = 10;
     public const int SRootDimension = 3;//square root of Dimension
     public const int TotalCellsCount = 9 * 9;
-
-
 }

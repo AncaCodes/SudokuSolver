@@ -27,6 +27,7 @@ public class SudokuGridFactory : ISudokuGridFactory
     {
         CreateRandomGrid();
         CheckFunctions.RemoveKDigits(Random.Shared.Next(43, 49), cells);
+        CheckFunctions.SolveSudoku(cells);
 
         return new GridContext
         {
@@ -39,7 +40,6 @@ public class SudokuGridFactory : ISudokuGridFactory
         CreateRandomGrid();
 
         CheckFunctions.RemoveKDigits(Random.Shared.Next(50, 55), cells);
-
         return new GridContext
         {
             Cells = cells

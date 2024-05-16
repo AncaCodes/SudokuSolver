@@ -189,8 +189,10 @@ namespace SudokuSolver.Web.Models
                 {
                     PossibleValues++;
                     CellValue = k;
+                    Console.WriteLine(i + j + "tested digit: " + k);
                 }
             }
+            Console.WriteLine(PossibleValues);
             if (PossibleValues == 1)
             {
                 return i * 100 + j * 10 + CellValue;
@@ -259,7 +261,75 @@ namespace SudokuSolver.Web.Models
 
                 }
             }
-        } 
+        }
+
+        public static void LineColumnToBoxRestriction(int[,,] c, int[,] Cells)
+        {
+            int row_sum = 0, col_sum = 0, zone_sum = 0;
+            for (int tested_digit = 1; tested_digit <= Settings.Dimension; tested_digit++)
+            {
+                Console.WriteLine("Test digit " + tested_digit);
+                for (int rowstart = 1; rowstart < Settings.Dimension; rowstart = rowstart + 3)
+                {
+                    for (int colstart = 1; colstart < Settings.Dimension; colstart = colstart + 3)
+                    {
+                        Console.WriteLine("line: " + rowstart + "col: " + colstart);
+                        for (int i = 0; i < Settings.SRootDimension; i++)
+                        {
+                            if (UnusedInRow(rowstart + i - 1, tested_digit, Cells))
+                            {
+                                for (int j = 0; j < Settings.SRootDimension; j++)
+                                {
+                                    zone_sum += c[rowstart + i, colstart + j, tested_digit];
+                                }
+                                for (int j = 1; j <= Settings.Dimension; j++)
+                                {
+                                    row_sum += c[rowstart + i, j, tested_digit];
+                                }
+                                if (zone_sum == row_sum)
+                                {
+                                    for (int index = rowstart + 0; index <= rowstart + Settings.SRootDimension; index++)
+                                    {
+                                        for (int j = 0; j < Settings.SRootDimension; j++)
+                                        {
+                                            if (index != rowstart + i)
+                                                c[index, colstart + j, tested_digit] = 0;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        for (int j = 0; j < Settings.SRootDimension; j++)
+                        {
+
+                            if (UnusedInCol(colstart + j - 1, tested_digit, Cells))
+                            {
+                                for (int i = 0; i < Settings.SRootDimension; i++)
+                                {
+                                    zone_sum += c[rowstart + i, colstart + j, tested_digit];
+                                }
+                                for (int i = 1; i <= Settings.Dimension; i++)
+                                {
+                                    col_sum += c[i, colstart + j, tested_digit];
+                                }
+                                if (zone_sum == col_sum)
+                                {
+                                    for (int index = colstart + 0; index <= colstart + Settings.SRootDimension; index++)
+                                    {
+                                        for (int i = 0; i < Settings.SRootDimension; i++)
+                                        {
+                                            if (index != colstart + i)
+                                                c[rowstart + i, index, tested_digit] = 0;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         public static void SolveSudoku(int[,] Cells)
         {
 
@@ -305,10 +375,11 @@ namespace SudokuSolver.Web.Models
                         if (c[i, j, 10] == 0)
                         {
                             PossibleValues = CheckFunctions.CountPossibleValues(i, j, c);
-                            Console.WriteLine("Possible values: " + (i) + (j) + " are " + PossibleValues / 10);
+                            Console.WriteLine(PossibleValues);
+                            Console.WriteLine("Possible values: " + i + j + " are " + PossibleValues % 10);
                             if (PossibleValues != 0)
                             {
-                                Console.WriteLine("The only value: " + (i) + (j) + " is " + PossibleValues / 10);
+                                Console.WriteLine("The only value: " + i + j + " is " + PossibleValues % 10);
                                 c[i, j, 10] = PossibleValues % 10;
                                 for (int k = 1; k <= Settings.Dimension; k++)
                                 {
@@ -320,7 +391,8 @@ namespace SudokuSolver.Web.Models
                     }
                 }
                 //update line, column, zone restriction
-                CheckFunctions.ZoneRestriction(c,Cells);
+                CheckFunctions.LineColumnToBoxRestriction(c, Cells);
+                CheckFunctions.ZoneRestriction(c, Cells);
                 for (int index = 1; index <= Settings.Dimension; index++)
                 {
                     for (int j = 1; j <= Settings.Dimension; j++)
@@ -331,8 +403,8 @@ namespace SudokuSolver.Web.Models
                             PossibleValues = CheckFunctions.CountPossibleValues(index, j, c);
                             if (PossibleValues != 0)
                             {
-                                Console.WriteLine("The only value: " + (index) + (j) + " is " + PossibleValues % 10);
-                                RelativePosition = PossibleValues / 10 % 10; ;
+                                RelativePosition = PossibleValues / 10 % 10;
+                                Console.WriteLine("The only value: " + index + RelativePosition + " is " + PossibleValues % 10);
                                 c[index, RelativePosition, 10] = PossibleValues % 10;
                                 for (int k = 1; k <= Settings.Dimension; k++)
                                 {
@@ -351,8 +423,8 @@ namespace SudokuSolver.Web.Models
 
                             if (PossibleValues != 0)
                             {
-                                Console.WriteLine("line: " + RelativePosition + " col: " + index + " value " + PossibleValues % 10);
                                 RelativePosition = PossibleValues / 100;
+                                Console.WriteLine("line: " + RelativePosition + " col: " + index + " value " + PossibleValues % 10);
                                 c[RelativePosition, index, 10] = PossibleValues % 10;
                                 for (int k = 1; k <= Settings.Dimension; k++)
                                 {

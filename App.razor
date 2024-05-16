@@ -6,6 +6,8 @@
     <div class="button" @onclick="SetEasyDifficulty">Easy</div>
     <div class="button" @onclick="SetMediumDifficulty">Medium</div>
     <div class="button" @onclick="SetHardDifficulty">Hard</div>
+    <div class="button" @onclick="SolveSudoku">SolveSudoku</div>
+
 </div>
 
 @if (gridContext is not null)
@@ -48,5 +50,9 @@
 
     }
 
- 
+    void SolveSudoku()
+    {
+        CheckFunctions.SolveSudoku(gridContext.Cells);
+    }
+
 }

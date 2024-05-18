@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Diagnostics;
 
 namespace SudokuSolver.Web.Models
 {
@@ -330,6 +331,183 @@ namespace SudokuSolver.Web.Models
             }
         }
 
+        public static void LineNakedPairsRestrictiction(int[,,] c, int[,] Cells)
+        {
+            int sum_digit1;
+            int sum_digit2;
+            List<int> col1 = new List<int>();
+            List<int> col2 = new List<int>();
+            for (int digit1 = 1; digit1 <= Settings.Dimension; digit1++)
+            {
+                for (int digit2 = 1; digit2 <= Settings.Dimension; digit2++)
+
+                {
+                    for (int i = 1; i <= Settings.Dimension; i++)
+                    {
+
+                        if (UnusedInRow(i, digit1, Cells) && UnusedInRow(i, digit2, Cells))//////////////////////
+                        {
+                            sum_digit1 = 0;
+                            sum_digit2 = 0;
+                            for (int j = 0; j <= Settings.Dimension; j++)
+                            {
+                                if (c[i, j, digit1] == 1)
+                                {
+                                    sum_digit1 += c[i, j, digit1];
+                                    col1.Add(j);
+                                }
+                                if (c[i, j, digit2] == 1)
+                                {
+                                    sum_digit2 += c[i, j, digit2];
+                                    col2.Add(j);
+                                }
+                            }
+                            // (digit1, digit2) -  naked pair along line i
+                            // Imposes restrictions over line i except (i, jnaked) where pairs appear
+                            if ((sum_digit1 == sum_digit2 && sum_digit1 == 2) && (Enumerable.SequenceEqual(col1, col2)))
+                            {
+                                for (int j = 1; j <= Settings.Dimension; j++)
+                                {
+                                    if (!col1.Contains(j))
+                                    {
+                                        c[i, j, digit1] = 0;
+                                        c[i, j, digit2] = 0;
+                                    }
+                                }
+                            }
+                            col1.Clear();
+                            col2.Clear();
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void ColNakedPairsRestrictiction(int[,,] c, int[,] Cells)
+        {
+            int sum_digit1 = 0;
+            int sum_digit2 = 0;
+            List<int> line1 = new List<int>();
+            List<int> line2 = new List<int>();
+            for (int digit1 = 1; digit1 <= Settings.Dimension; digit1++)
+            {
+                for (int digit2 = 1; digit2 <= Settings.Dimension; digit2++)
+
+                {
+                    for (int j = 1; j <= Settings.Dimension; j++)
+                    {
+                        sum_digit1 = 0;
+                        sum_digit2 = 0;
+                        for (int i = 0; i <= Settings.Dimension; i++)
+                        {
+                            if (c[i, j, 10] != 0)
+                            {
+                                break;
+                            }
+                            if (c[i, j, digit1] == 1)
+                            {
+                                sum_digit1 += c[i, j, digit1];
+                                line1.Add(i);
+                            }
+                            if (c[i, j, digit2] == 1)
+                            {
+                                sum_digit2 += c[i, j, digit2];
+                                line2.Add(i);
+                            }
+                        }
+                        // (digit1, digit2) -  naked pair along column i
+                        // Imposes restrictions over line i except (inaked, j) where pairs appear
+                        if ((sum_digit1 == sum_digit2 && sum_digit1 == 2) && (Enumerable.SequenceEqual(line1, line2)))
+                        {
+                            for (int i = 1; i <= Settings.Dimension; i++)
+                            {
+                                if (!line1.Contains(i))
+                                {
+                                    c[i, j, digit1] = 0;
+                                    c[i, j, digit2] = 0;
+                                }
+                            }
+                        }
+                        line1.Clear();
+                        line2.Clear();
+                    }
+                }
+            }
+        }
+
+
+        public static void ZoneNakedPairsRestrictiction(int[,,] c, int[,] Cells)
+        {
+            int posibilities;
+            int total_nakedcells;
+            int inaked, jnaked;
+            List<int> indices = new List<int>();
+
+            for (int rowstart = 1; rowstart < Settings.Dimension; rowstart = rowstart + 3)
+            {
+                for (int colstart = 1; colstart < Settings.Dimension; colstart = colstart + 3)
+                {
+
+                    for (int digit1 = 1; digit1 <= 9; digit1++)
+                    {
+                        if (UnusedInBox(rowstart, colstart, digit1, Cells))
+                        {
+
+                            for (int digit2 = 1; digit2 <= 9; digit2++)
+                            {
+                                if (UnusedInBox(rowstart, colstart, digit2, Cells))
+                                {
+                                    posibilities = 0;
+                                    total_nakedcells = 0;
+                                    indices.Clear();
+                                    for (int i = 0; i < Settings.SRootDimension; i++)
+                                    {
+                                        for (int j = 0; j < Settings.SRootDimension; j++)
+                                        {
+                                            if (c[rowstart + i, colstart + j, digit1] == 1 && c[rowstart + i, colstart + j, digit2] == 1)
+                                            {
+                                                posibilities++;
+                                                for (int other_digit = 0; other_digit <= 9; other_digit++)
+                                                {
+                                                    posibilities += c[rowstart + i, colstart + j, other_digit];
+                                                }
+                                                if (posibilities == 2)
+                                                {
+                                                    indices.Add((rowstart + i) * 10 + colstart + j);
+                                                    total_nakedcells++;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (total_nakedcells == 2 && indices.Any())
+                                    {
+                                        for (int i = 0; i < Settings.SRootDimension; i++)
+                                        {
+                                            for (int j = 0; j < Settings.SRootDimension; j++)
+                                            {
+                                                c[i, j, digit1] = 0;
+                                                c[i, j, digit2] = 0;
+                                            }
+                                        }
+                                        inaked = indices.First() / 10;
+                                        jnaked = indices.First() % 10;
+                                        c[inaked, jnaked, digit1] = 1;
+                                        c[inaked, jnaked, digit2] = 1;
+                                        inaked = indices.Last() / 10;
+                                        jnaked = indices.Last() % 10;
+                                        c[inaked, jnaked, digit1] = 1;
+                                        c[inaked, jnaked, digit2] = 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
         public static void SolveSudoku(int[,] Cells)
         {
 
@@ -393,6 +571,8 @@ namespace SudokuSolver.Web.Models
                 //update line, column, zone restriction
                 CheckFunctions.LineColumnToBoxRestriction(c, Cells);
                 CheckFunctions.ZoneRestriction(c, Cells);
+                CheckFunctions.LineNakedPairsRestrictiction(c, Cells);
+                CheckFunctions.ColNakedPairsRestrictiction(c, Cells);
                 for (int index = 1; index <= Settings.Dimension; index++)
                 {
                     for (int j = 1; j <= Settings.Dimension; j++)
@@ -443,7 +623,7 @@ namespace SudokuSolver.Web.Models
 
 
         }
-
     }
 
 }
+

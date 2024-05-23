@@ -11,7 +11,6 @@ namespace SudokuSolver.Web.Models
 {
     public static class CheckFunctions
     {
-
         public static void FillDiagonal(int[,] cells)
         {
 
@@ -137,35 +136,11 @@ namespace SudokuSolver.Web.Models
         }
 
 
-
-        // Function to solve the Sudoku
-        public static bool SolveSudokuBacktracking(int[,] cells)
-        {
-            int row = 0, col = 0;
-            if (!FindUnassignedLocation(cells, ref row, ref col))
-                return true; // success!
-
-            for (int num = 1; num <= Settings.Dimmension; num++)
-            {
-                if (CheckIfSafe(row, col, num, cells))
-                {
-                    cells[row, col] = num;
-
-                    if (SolveSudokuBacktracking(cells))
-                        return true;
-
-                    cells[row, col] = 0;
-                }
-            }
-            return false; // triggers backtracking
-        }
-
-        // Function to find an unassigned location
         private static bool FindUnassignedLocation(int[,] cells, ref int row, ref int col)
         {
-            for (row = 0; row < Settings.Dimmension; row++)
+            for (row = 0; row < Settings.Dimension; row++)
             {
-                for (col = 0; col < Settings.Dimmension; col++)
+                for (col = 0; col < Settings.Dimension; col++)
                 {
                     if (cells[row, col] == 0)
                         return true;
@@ -173,21 +148,6 @@ namespace SudokuSolver.Web.Models
             }
             return false;
         }
-
-
-
-        public static void SolveSudoku(int[,] Cells)
-        {
-            if (CheckFunctions.SolveSudokuBacktracking(Cells))
-            {
-                Print(Cells);
-            }
-            else
-            {
-                Console.WriteLine("No solution exists");
-            }
-        }
-
         static void Print(int[,] cells)
         {
             for (int i = 0; i < cells.GetLength(0); i++)
@@ -197,6 +157,135 @@ namespace SudokuSolver.Web.Models
                     Console.Write(cells[i, j] + " ");
                 }
                 Console.WriteLine();
+            }
+        }
+
+        public static bool SolveSudokuBacktracking(int[,] cells)
+        {
+            int[,,] possibilities = InitializePossibilities(cells);
+            LineColumnToBoxRestriction(possibilities, cells);
+
+            int row = 0, col = 0;
+            if (!FindUnassignedLocation(cells, ref row, ref col))
+                return true;
+
+            for (int num = 1; num <= Settings.Dimension; num++)
+            {
+                if (CheckIfSafe(row, col, num, cells))
+                {
+                    cells[row, col] = num;
+                    LineColumnToBoxRestriction(possibilities, cells);
+
+                    if (SolveSudokuBacktracking(cells))
+                        return true;
+
+                    cells[row, col] = 0;
+                }
+            }
+            return false;
+        }
+
+        public static int[,,] InitializePossibilities(int[,] cells)
+        {
+            int[,,] possibilities = new int[Settings.Dimension, Settings.Dimension, Settings.Dimension + 1];
+            for (int i = 0; i < Settings.Dimension; i++)
+            {
+                for (int j = 0; j < Settings.Dimension; j++)
+                {
+                    if (cells[i, j] == 0)
+                    {
+                        for (int k = 1; k <= Settings.Dimension; k++)
+                        {
+                            possibilities[i, j, k] = 1;
+                        }
+                    }
+                }
+            }
+            return possibilities;
+        }
+
+        public static void LineColumnToBoxRestriction(int[,,] c, int[,] Cells)
+        {
+            int row_sum = 0, col_sum = 0, zone_sum = 0;
+            for (int tested_digit = 1; tested_digit <= Settings.Dimension; tested_digit++)
+            {
+                for (int rowstart = 0; rowstart < Settings.Dimension; rowstart += 3)
+                {
+                    for (int colstart = 0; colstart < Settings.Dimension; colstart += 3)
+                    {
+                        for (int i = 0; i < Settings.SRootDimension; i++)
+                        {
+                            if (UnusedInRow(rowstart + i, tested_digit, Cells))
+                            {
+                                zone_sum = 0;
+                                row_sum = 0;
+                                for (int j = 0; j < Settings.SRootDimension; j++)
+                                {
+                                    zone_sum += c[rowstart + i, colstart + j, tested_digit];
+                                }
+                                for (int j = 0; j < Settings.Dimension; j++)
+                                {
+                                    row_sum += c[rowstart + i, j, tested_digit];
+                                }
+                                if (zone_sum == row_sum && zone_sum != 0)
+                                {
+                                    for (int index = rowstart; index < rowstart + Settings.SRootDimension; index++)
+                                    {
+                                        for (int j = 0; j < Settings.SRootDimension; j++)
+                                        {
+                                            if (index != rowstart + i)
+                                            {
+                                                c[index, colstart + j, tested_digit] = 0;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        for (int j = 0; j < Settings.SRootDimension; j++)
+                        {
+                            if (UnusedInCol(colstart + j, tested_digit, Cells))
+                            {
+                                zone_sum = 0;
+                                col_sum = 0;
+                                for (int i = 0; i < Settings.SRootDimension; i++)
+                                {
+                                    zone_sum += c[rowstart + i, colstart + j, tested_digit];
+                                }
+                                for (int i = 0; i < Settings.Dimension; i++)
+                                {
+                                    col_sum += c[i, colstart + j, tested_digit];
+                                }
+                                if (zone_sum == col_sum && zone_sum != 0)
+                                {
+                                    for (int index = colstart; index < colstart + Settings.SRootDimension; index++)
+                                    {
+                                        for (int i = 0; i < Settings.SRootDimension; i++)
+                                        {
+                                            if (index != colstart + j)
+                                            {
+                                                c[rowstart + i, index, tested_digit] = 0;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Console.WriteLine("LineColumnToBoxRestriction was executed.");
+        }
+
+        public static void SolveSudoku(int[,] cells)
+        {
+            if (CheckFunctions.SolveSudokuBacktracking(cells))
+            {
+                Print(cells);
+            }
+            else
+            {
+                Console.WriteLine("No solution exists");
             }
         }
     }

@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using SudokuSolver.Web.Models;
 using SudokuSolver.Web.Services;
+
 
 namespace SudokuSolver.Web;
 
@@ -12,5 +14,7 @@ public class Program
         builder.RootComponents.Add<App>("#app");
 
         await builder.Build().RunAsync();
-    }
+
+        }
+
 }

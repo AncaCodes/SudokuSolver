@@ -26,6 +26,7 @@ public class SudokuGridFactory : ISudokuGridFactory
     public GridContext CreateEasyGrid()
     {
         CreateRandomGrid();
+        CheckFunctions.Print(cells);
         CheckFunctions.RemoveKDigits(Random.Shared.Next(43, 49), cells);
 
         return new GridContext

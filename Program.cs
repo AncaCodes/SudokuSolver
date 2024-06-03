@@ -1,11 +1,20 @@
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using SudokuSolver.Web;
+using SudokuSolver.Web.Models;
+using SudokuSolver.Web.Services;
 
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+namespace SudokuSolver.Web;
 
-await builder.Build().RunAsync();
+public class Program
+{
+    public static async Task Main(string[] args)
+    {
+        var builder = WebAssemblyHostBuilder.CreateDefault(args);
+        builder.Services.AddTransient<ISudokuGridFactory, SudokuGridFactory>();
+        builder.RootComponents.Add<App>("#app");
+
+        await builder.Build().RunAsync();
+
+        }
+
+}

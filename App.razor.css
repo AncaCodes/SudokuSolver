@@ -14,16 +14,13 @@ body {
     margin: 0;
 }
 
-button{
-    
-
-}
 
 .container {
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 
 .sudoku-grid {
@@ -120,3 +117,6 @@ button{
         background-color: var(--light-border);
         color: var(--outline-border);
     }
+button.hidden {
+    visibility: hidden;
+}

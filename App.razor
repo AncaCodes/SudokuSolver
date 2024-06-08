@@ -2,29 +2,47 @@
 @using SudokuSolver.Web.Services
 @inject ISudokuGridFactory SudokuGridFactory
 
-<div class="button-container">
-    <div class="button" @onclick="SetEasyDifficulty">Easy</div>
-    <div class="button" @onclick="SetMediumDifficulty">Medium</div>
-    <div class="button" @onclick="SetHardDifficulty">Hard</div>
-    <div class="button" @onclick="SolveSudoku">SolveSudoku</div>
 
+
+
+<div class="container">
+    <div class="button-container">
+        <div class="button" @onclick="SetEasyDifficulty">Easy</div>
+        <div class="button" @onclick="SetMediumDifficulty">Medium</div>
+        <div class="button" @onclick="SetHardDifficulty">Hard</div>
+    </div>
+
+    <div class="container">
+        
+        @if (gridContext is null)
+        {
+            <div class="button-container">
+
+                <div class="button.hidden"> </div>
+            </div>
+            <div class="sudoku-grid"></div>
+
+        }
+        @if (gridContext is not null)
+        {
+            <div class="button-container">
+
+                <div class="button" @onclick="SolveSudoku">SolveSudoku</div>
+            </div>
+            <div class="sudoku-grid">
+                @foreach (var cell in gridContext.Cells)
+                {
+
+                    <div class="sudoku-grid-cell">
+                        @(cell != 0 ? cell.ToString() : " ")
+                    </div>
+
+                }
+            </div>
+        }
+    </div>
 </div>
 
-@if (gridContext is not null)
-{
-    <div class="container">
-        <div class="sudoku-grid">
-            @foreach (var cell in gridContext.Cells)
-            {
-
-                <div class="sudoku-grid-cell">
-                    @(cell != 0 ? cell.ToString() : " ")
-                </div>
-             
-            }
-        </div>
-    </div>
-}
 
 
 @code {
@@ -50,9 +68,11 @@
 
     }
 
+
     void SolveSudoku()
     {
         CheckFunctions.SolveBacktracking(gridContext.Cells);
     }
 
 }
+

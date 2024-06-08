@@ -285,7 +285,6 @@ namespace SudokuSolver.Web.Models
                     }
                 }
             }
-            // Console.WriteLine("LineColumnToBoxRestriction was executed.");
         }
 
         public static void LineNakedPairsRestriction(int[,,] c, int[,] Cells)
@@ -338,46 +337,8 @@ namespace SudokuSolver.Web.Models
                     }
                 }
             }
-            //Console.WriteLine("LineNakedPairsRestriction was executed.");
         }
-        //public static void LineNakedTriplesRestriction(int[,,] c, int[,] Cells)
-        //{
-        //    List<int> candidates = new List<int>();
-        //    for (int i = 0; i < Settings.Dimension; i++)
-        //    {
-        //        for (int j1 = 0; j1 < Settings.Dimension - 2; j1++)
-        //        {
-        //            for (int j2 = j1 + 1; j2 < Settings.Dimension - 1; j2++)
-        //            {
-        //                for (int j3 = j2 + 1; j3 < Settings.Dimension; j3++)
-        //                {
-        //                    candidates.Clear();
-        //                    for (int digit = 1; digit <= Settings.Dimension; digit++)
-        //                    {
-        //                        if (c[i, j1, digit] == 1) candidates.Add(digit);
-        //                        if (c[i, j2, digit] == 1 && !candidates.Contains(digit)) candidates.Add(digit);
-        //                        if (c[i, j3, digit] == 1 && !candidates.Contains(digit)) candidates.Add(digit);
-        //                    }
-
-        //                    if (candidates.Count == 3)
-        //                    {
-        //                        for (int j = 0; j < Settings.Dimension; j++)
-        //                        {
-        //                            if (j != j1 && j != j2 && j != j3)
-        //                            {
-        //                                foreach (int digit in candidates)
-        //                                {
-        //                                    c[i, j, digit] = 0;
-        //                                }
-        //                            }
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //    //Console.WriteLine("LineNakedTriplesRestriction was executed.");
-        //}
+       
         public static void ColNakedPairsRestriction(int[,,] c, int[,] cells)
         {
             for (int j = 0; j < Settings.Dimension; j++)
@@ -420,7 +381,6 @@ namespace SudokuSolver.Web.Models
                 }
 
             }
-            // Console.WriteLine("ColNakedPairsRestriction was executed.");
         }
 
         public static void XWingRestriction(int[,,] c, int[,] cells)
@@ -476,7 +436,6 @@ namespace SudokuSolver.Web.Models
 
         public static void YWingRestriction(int[,,] c)
         {
-            // Step 1: Identify cells with exactly two candidates
             List<(int, int)> cellsWithTwoCandidates = new List<(int, int)>();
 
             for (int i = 0; i < Settings.Dimension; i++)
@@ -491,7 +450,6 @@ namespace SudokuSolver.Web.Models
                 }
             }
 
-            // Step 2: For all possible triples of places (p(l1), p(l2), p(l3))
             for (int l1 = 0; l1 < cellsWithTwoCandidates.Count; l1++)
             {
                 for (int l2 = l1 + 1; l2 < cellsWithTwoCandidates.Count; l2++)
@@ -506,10 +464,8 @@ namespace SudokuSolver.Web.Models
                         List<int> candidates2 = GetCandidates(c, i2, j2);
                         List<int> candidates3 = GetCandidates(c, i3, j3);
 
-                        // Step 3: Check if they form a Y-Wing with p1 as pivot
                         if (FormsYWing(candidates1, candidates2, candidates3, out int restrictedDigit))
                         {
-                            // Step 4: Apply restrictions according to Y-Wing
                             ApplyYWingRestrictions(c, i1, j1, i2, j2, i3, j3, restrictedDigit);
                         }
                     }
@@ -604,7 +560,6 @@ namespace SudokuSolver.Web.Models
             LineColumnToBoxRestriction(possibilities, cells);
             ZoneRestriction(possibilities, cells);
             LineNakedPairsRestriction(possibilities, cells);
-            //LineNakedTriplesRestriction(possibilities, cells);
             ColNakedPairsRestriction(possibilities, cells);
             //XWingRestriction(possibilities, cells);
             //YWingRestriction(possibilities);
@@ -826,13 +781,11 @@ namespace SudokuSolver.Web.Models
 
                 if (!progress)
                 {
-                    Console.WriteLine("Apply SPECIAL");
                     ApplySpecialRestrictions(possibilities, cells);
                     progress = FindCellValue(possibilities, cells);
                     progress = (progress || ApplyColumnExclusivity(possibilities, cells) || ApplyLineExclusivity(possibilities, cells) || ApplyZoneExclusivity(possibilities, cells));
                 }
                 ok--;
-                Console.WriteLine("OK is " + ok + " Progress is " + progress + " Hasunsolved: " + HasUnsolvedCells(cells));
             }
             if (HasUnsolvedCells(cells))
             {
@@ -857,20 +810,6 @@ namespace SudokuSolver.Web.Models
                 }
             }
 
-
-            for (int i = 0; i < Settings.Dimension; i++)
-            {
-                for (int j = 0; j < Settings.Dimension; j++)
-                {
-                    if (cells[i, j] == 0)
-                    {
-                        for (int digit = 1; digit <= Settings.Dimension; digit++)
-                        {
-                            if (possibilities[i, j, digit] == 1) Console.WriteLine(" Row: " + i + " Col: " + j + " Digit: " + digit + " can be " + possibilities[i, j, digit]);
-                        }
-                    }
-                }
-            }
             if (!HasUnsolvedCells(cells))
             {
                 Print(cells);
@@ -879,8 +818,6 @@ namespace SudokuSolver.Web.Models
             else return false;
 
         }
-
-
 
         public static void UpdatePossibilities(int[,,] possibilities)
         {

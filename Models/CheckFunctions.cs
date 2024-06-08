@@ -90,7 +90,6 @@ namespace SudokuSolver.Web.Models
             return true;
         }
 
-
         public static bool FillRemaining(int i, int j, int[,] cells)
         {
             if (j >= Settings.Dimension && i < Settings.Dimension - 1)
@@ -136,21 +135,17 @@ namespace SudokuSolver.Web.Models
             return false;
         }
 
-
-        private static int FindUnassignedLocation(int[,] cells, ref int row, ref int col)
+        private static bool FindUnassignedLocation(int[,] cells, ref int row, ref int col)
         {
             for (row = 0; row < Settings.Dimension; row++)
             {
                 for (col = 0; col < Settings.Dimension; col++)
                 {
                     if (cells[row, col] == 0)
-                    {
-                        int position = row * 10 + col;
-                        return position;
-                    }
+                        return true;
                 }
             }
-            return -1;
+            return false;
         }
         public static void Print(int[,] cells)
         {
@@ -382,7 +377,43 @@ namespace SudokuSolver.Web.Models
 
             }
         }
+        public static void LineNakedTriplesRestriction(int[,,] c, int[,] Cells)
+        {
+            List<int> candidates = new List<int>();
+            for (int i = 0; i < Settings.Dimension; i++) 
+            {
+                for (int j1 = 0; j1 < Settings.Dimension - 2; j1++)
+                {
+                    for (int j2 = j1 + 1; j2 < Settings.Dimension - 1; j2++)
+                    {
+                        for (int j3 = j2 + 1; j3 < Settings.Dimension; j3++)
+                        {
+                            candidates.Clear();
+                            for (int digit = 1; digit <= Settings.Dimension; digit++)
+                            {
+                                if (c[i, j1, digit] == 1) candidates.Add(digit);
+                                if (c[i, j2, digit] == 1 && !candidates.Contains(digit)) candidates.Add(digit);
+                                if (c[i, j3, digit] == 1 && !candidates.Contains(digit)) candidates.Add(digit);
+                            }
 
+                            if (candidates.Count == 3)
+                            {
+                                for (int j = 0; j < Settings.Dimension; j++)
+                                {
+                                    if (j != j1 && j != j2 && j != j3)
+                                    {
+                                        foreach (int digit in candidates)
+                                        {
+                                            c[i, j, digit] = 0;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         public static void XWingRestriction(int[,,] c, int[,] cells)
         {
             for (int digit = 1; digit <= Settings.Dimension; digit++)
@@ -555,16 +586,21 @@ namespace SudokuSolver.Web.Models
             return possibilities;
         }
 
+
         private static void ApplySpecialRestrictions(int[,,] possibilities, int[,] cells)
         {
+            UpdatePossibilities(cells);
             LineColumnToBoxRestriction(possibilities, cells);
             ZoneRestriction(possibilities, cells);
             LineNakedPairsRestriction(possibilities, cells);
+            LineNakedTriplesRestriction(possibilities, cells); 
             ColNakedPairsRestriction(possibilities, cells);
-            //XWingRestriction(possibilities, cells);
-            //YWingRestriction(possibilities);
-        }
+            XWingRestriction(possibilities, cells);
+            XWingRestriction(possibilities, cells);
+            YWingRestriction(possibilities);
 
+        }
+     
         private static int CountPossibilities(int[,,] possibilities, int row, int col)
         {
             int count = 0;
@@ -576,6 +612,26 @@ namespace SudokuSolver.Web.Models
                 }
             }
             return count;
+        }
+        public static bool UpdatePossibilities(int[,] cells)
+        {
+            int row = 0, col = 0;
+            if (!FindUnassignedLocation(cells, ref row, ref col))
+                return true;
+
+            for (int num = 1; num <= Settings.Dimension; num++)
+            {
+                if (CheckIfSafe(row, col, num, cells))
+                {
+                    cells[row, col] = num;
+
+                    if (UpdatePossibilities(cells))
+                        return true;
+
+                    cells[row, col] = 0;
+                }
+            }
+            return false;
         }
 
         private static int FindLastPossibility(int[,,] possibilities, int row, int col)
@@ -764,60 +820,6 @@ namespace SudokuSolver.Web.Models
             }
             return progress;
         }
-        public static bool SolveBacktracking(int[,] cells)
-        {
-            int[,,] possibilities = InitializePossibilities(cells);
-            UpdatePossibilities(possibilities);
-            bool progress = true;
-            int ok = 100;
-            while (progress && HasUnsolvedCells(cells))
-            {
-                progress = false;
-                while (FindCellValue(possibilities, cells))
-                {
-                    progress = (ApplyColumnExclusivity(possibilities, cells) || ApplyLineExclusivity(possibilities, cells) || ApplyZoneExclusivity(possibilities, cells));
-                }
-                progress = (ApplyColumnExclusivity(possibilities, cells) || ApplyLineExclusivity(possibilities, cells) || ApplyZoneExclusivity(possibilities, cells));
-
-                if (!progress)
-                {
-                    ApplySpecialRestrictions(possibilities, cells);
-                    progress = FindCellValue(possibilities, cells);
-                    progress = (progress || ApplyColumnExclusivity(possibilities, cells) || ApplyLineExclusivity(possibilities, cells) || ApplyZoneExclusivity(possibilities, cells));
-                }
-                ok--;
-            }
-            if (HasUnsolvedCells(cells))
-            {
-                for (int i = 0; i < Settings.Dimension; i++)
-                {
-                    for (int j = 0; j < Settings.Dimension; j++)
-                    {
-                        if (cells[i, j] == 0)
-                        {
-                            for (int digit = 1; digit <= 9; digit++)
-                            {
-                                if (CheckIfSafe(i, j, digit, cells)){
-                                    cells[i, j] = digit;
-                                    if (SolveBacktracking(cells) == false)
-                                    {
-                                        cells[i, j] = 0;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!HasUnsolvedCells(cells))
-            {
-                Print(cells);
-                return true;
-            }
-            else return false;
-
-        }
 
         public static void UpdatePossibilities(int[,,] possibilities)
         {
@@ -863,6 +865,40 @@ namespace SudokuSolver.Web.Models
             }
 
         }
+
+        public static bool SolveBacktracking(int[,] cells)
+        {
+            int[,,] possibilities = InitializePossibilities(cells);
+            UpdatePossibilities(possibilities);
+            bool progress = true;
+            int ok = 100;
+            while (progress && HasUnsolvedCells(cells))
+            {
+                progress = false;
+                while (FindCellValue(possibilities, cells))
+                {
+                    progress = (ApplyColumnExclusivity(possibilities, cells) || ApplyLineExclusivity(possibilities, cells) || ApplyZoneExclusivity(possibilities, cells));
+                }
+                progress = (ApplyColumnExclusivity(possibilities, cells) || ApplyLineExclusivity(possibilities, cells) || ApplyZoneExclusivity(possibilities, cells));
+
+                if (!progress)
+                {
+                    ApplySpecialRestrictions(possibilities, cells);
+                    progress = FindCellValue(possibilities, cells);
+                    progress = (progress || ApplyColumnExclusivity(possibilities, cells) || ApplyLineExclusivity(possibilities, cells) || ApplyZoneExclusivity(possibilities, cells));
+                }
+                ok--;
+            }
+
+            if (!HasUnsolvedCells(cells))
+            {
+                Print(cells);
+                return true;
+            }
+            else return false;
+
+        }
+
 
     }
 }
